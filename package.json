@@ -1,0 +1,32 @@
+{
+  "name": "catalogue-for-html",
+  "version": "0.0.1",
+  "description": "html page with catalogue",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --env=development --watch",
+    "build": "webpack --env=production",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/LeeChar/catalogue-for-html.git"
+  },
+  "keywords": [
+    "jquery",
+    "catalogue-for-html",
+    "catalogue"
+  ],
+  "author": "LeeChar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LeeChar/catalogue-for-html/issues"
+  },
+  "homepage": "https://github.com/LeeChar/catalogue-for-html#readme",
+  "dependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "jquery": "^3.4.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9"
+  }
+}
