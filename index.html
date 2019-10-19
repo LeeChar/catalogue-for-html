@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="article___2H6vq">
+    <article id="content" class="article-content" tabindex="0" style="outline-style: none;">
+      <div class="header___O32EY">
+        <div class="title___3ntsK">
+          <h1 id="article-title" class="articleTitle___3zWrP">异步流程发展、Promise、async + await</h1>
+        </div>
+      </div>
+      <div class="content___2v1LS">
+        <div class="yuque-doc-content" data-df="lake" style="position: relative;">
+          <div class="lake-engine-view" tabindex="0">
+            <h1 id="Mq7O9"><a class="lake-anchor" href="#Mq7O9"></a>callback的世界</h1>
+            <p><br></p>
+            <h2 id="vqq71"><a class="lake-anchor" href="#vqq71"></a>利用高阶函数批量生成方法</h2>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20isType(type)%7B%5Cn%20%20return%20function%20(obj)%7B%5Cn%20%20%20%20return%20Object.prototype.toString.call(obj).includes(type)%3B%5Cn%20%20%7D%5Cn%7D%5Cn%5Cnconst%20types%20%3D%20%5B'String'%2C'Object'%2C'Array'%2C'Null'%2C'Undefined'%2C'Boolean'%5D%3B%5Cnconst%20fns%20%3D%20%7B%7D%3B%5Cn%5Cntypes.forEach(%20type%20%3D%3E%20%7B%5Cn%20%20%20%20fns%5B'is'%2Btype%5D%20%3D%20isType(type)%5Cn%7D)%5Cn%5Cnlet%20a%20%3D%20true%3B%5Cn%5Cnconsole.log(fns.isString(a))%3B%20%2F%2F%20false%22%2C%22id%22%3A%223kZtd%22%7D"
+              id="3kZtd">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre
+                          class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">isType</span>(<span class="cm-def">type</span>){
+      <span class="cm-keyword">return</span> <span class="cm-keyword">function</span> (<span class="cm-def">obj</span>){
+        <span class="cm-keyword">return</span> <span class="cm-variable">Object</span>.<span class="cm-property">prototype</span>.<span class="cm-property">toString</span>.<span class="cm-property">call</span>(<span class="cm-variable-2">obj</span>).<span class="cm-property">includes</span>(<span class="cm-variable-2">type</span>);
+      }
+    }
+    
+    <span class="cm-keyword">const</span> <span class="cm-def">types</span> <span class="cm-operator">=</span> [<span class="cm-string">'String'</span>,<span class="cm-string">'Object'</span>,<span class="cm-string">'Array'</span>,<span class="cm-string">'Null'</span>,<span class="cm-string">'Undefined'</span>,<span class="cm-string">'Boolean'</span>];
+    <span class="cm-keyword">const</span> <span class="cm-def">fns</span> <span class="cm-operator">=</span> {};
+    
+    <span class="cm-variable">types</span>.<span class="cm-property">forEach</span>( <span class="cm-def">type</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable">fns</span>[<span class="cm-string">'is'</span><span class="cm-operator">+</span><span class="cm-variable-2">type</span>] <span class="cm-operator">=</span> <span class="cm-variable">isType</span>(<span class="cm-variable-2">type</span>)
+    })
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">a</span> <span class="cm-operator">=</span> <span class="cm-atom">true</span>;
+    
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">fns</span>.<span class="cm-property">isString</span>(<span class="cm-variable">a</span>)); <span class="cm-comment">// false</span></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="SGhdL"><a class="lake-anchor" href="#SGhdL"></a>面向切片编程 ——&nbsp;&nbsp;AOP</h2>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>定义：把原来代码切成片，在中间加上我自己的代码</p>
+            </blockquote>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20say(who)%7B%5Cn%20%20%20%20console.log(who%2B'%E8%AF%B4%E8%AF%9D')%5Cn%7D%5Cn%5CnFunction.prototype.before%20%3D%20function(fn)%7B%5Cn%20%20%20%20let%20that%20%3D%20this%3B%20%2F%2F%20that%E5%B0%B1%E6%98%AF%E5%8E%9F%E6%9D%A5%E7%9A%84say%E6%96%B9%E6%B3%95%5Cn%20%20%20%20return%20function()%7B%5Cn%20%20%20%20%20%20%20%20fn()%3B%20%2F%2F%20es6%20%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%20%E6%8A%8Aarguments%E5%8F%82%E6%95%B0%E5%B1%95%E5%BC%80%E4%BE%9D%E6%AC%A1%E4%BC%A0%E5%85%A5%5Cn%20%20%20%20%20%20%20%20that(...arguments)%3B%5Cn%20%20%20%20%7D%5Cn%7D%5Cn%5Cnlet%20newFn%20%3D%20say.before(function()%7B%20%2F%2F%20%E6%96%B0%E5%A2%9E%E7%9A%84%E5%87%BD%E6%95%B0%5Cn%20%20%20%20console.log('%E9%81%97%E8%A8%80')%3B%5Cn%7D)%3B%5Cn%5CnnewFn('%E6%88%91')%3B%22%2C%22id%22%3A%22Jdz15%22%7D"
+              id="Jdz15">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">say</span>(<span class="cm-def">who</span>){
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">who</span><span class="cm-operator">+</span><span class="cm-string">'说话'</span>)
+    }
+    
+    <span class="cm-variable">Function</span>.<span class="cm-property">prototype</span>.<span class="cm-property">before</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">fn</span>){
+        <span class="cm-keyword">let</span> <span class="cm-def">that</span> <span class="cm-operator">=</span> <span class="cm-keyword">this</span>; <span class="cm-comment">// that就是原来的say方法</span>
+        <span class="cm-keyword">return</span> <span class="cm-keyword">function</span>(){
+            <span class="cm-variable-2">fn</span>(); <span class="cm-comment">// es6 展开运算符 把arguments参数展开依次传入</span>
+            <span class="cm-variable-2">that</span>(<span class="cm-meta">...</span><span class="cm-variable-2">arguments</span>);
+        }
+    }
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">newFn</span> <span class="cm-operator">=</span> <span class="cm-variable">say</span>.<span class="cm-property">before</span>(<span class="cm-keyword">function</span>(){ <span class="cm-comment">// 新增的函数</span>
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'遗言'</span>);
+    });
+    
+    <span class="cm-variable">newFn</span>(<span class="cm-string">'我'</span>);</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="SnqP3"><a class="lake-anchor" href="#SnqP3"></a>React 事务</h2>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>这里的事务指：开始的时候做某些事，结束的时候再做某些事</p>
+            </blockquote>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20perform(fn%2C%20wrappers)%20%7B%5Cn%20%20wrappers.forEach(wraper%20%3D%3E%20%7B%5Cn%20%20%20%20wraper.initilizae()%5Cn%20%20%7D)%5Cn%20%20fn()%5Cn%20%20wrappers.forEach(wraper%20%3D%3E%20%7B%5Cn%20%20%20%20wraper.close()%5Cn%20%20%7D)%5Cn%7D%5Cn%5Cnperform(()%20%3D%3E%20%7B%5Cn%20%20console.log('%E7%9D%A1%E8%A7%89')%3B%5Cn%7D%2C%20%5B%5Cn%20%20%7B%5Cn%20%20%20%20initilizae()%20%7B%5Cn%20%20%20%20%20%20console.log('%E5%B7%A5%E4%BD%9C')%3B%5Cn%20%20%20%20%7D%2C%5Cn%20%20%20%20close()%20%7B%5Cn%20%20%20%20%20%20console.log('%E7%A9%BF%E8%A1%A3%E6%9C%8D')%3B%5Cn%20%20%20%20%7D%5Cn%20%20%7D%2C%5Cn%20%20%7B%5Cn%20%20%20%20initilizae()%20%7B%5Cn%20%20%20%20%20%20console.log('%E5%AD%A6%E4%B9%A0')%3B%5Cn%20%20%20%20%7D%2C%5Cn%20%20%20%20close()%20%7B%5Cn%20%20%20%20%20%20console.log('%E5%88%B7%E7%89%99')%3B%5Cn%20%20%20%20%7D%5Cn%20%20%7D%2C%5Cn%20%20%7B%5Cn%20%20%20%20initilizae()%20%7B%5Cn%20%20%20%20%20%20console.log('%E5%90%83%E5%96%9D%E6%8B%89%E6%92%92')%3B%5Cn%20%20%20%20%7D%2C%5Cn%20%20%20%20close()%20%7B%5Cn%20%20%20%20%20%20console.log('%E6%B4%97%E8%84%B8')%3B%5Cn%20%20%20%20%7D%5Cn%20%20%7D%5Cn%5D)%22%2C%22id%22%3A%22b5SRA%22%7D"
+              id="b5SRA">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">perform</span>(<span class="cm-def">fn</span>, <span class="cm-def">wrappers</span>) {
+      <span class="cm-variable-2">wrappers</span>.<span class="cm-property">forEach</span>(<span class="cm-def">wraper</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">wraper</span>.<span class="cm-property">initilizae</span>()
+      })
+      <span class="cm-variable-2">fn</span>()
+      <span class="cm-variable-2">wrappers</span>.<span class="cm-property">forEach</span>(<span class="cm-def">wraper</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">wraper</span>.<span class="cm-property">close</span>()
+      })
+    }
+    
+    <span class="cm-variable">perform</span>(() <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'睡觉'</span>);
+    }, [
+      {
+        <span class="cm-property">initilizae</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'工作'</span>);
+        },
+        <span class="cm-property">close</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'穿衣服'</span>);
+        }
+      },
+      {
+        <span class="cm-property">initilizae</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'学习'</span>);
+        },
+        <span class="cm-property">close</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'刷牙'</span>);
+        }
+      },
+      {
+        <span class="cm-property">initilizae</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'吃喝拉撒'</span>);
+        },
+        <span class="cm-property">close</span>() {
+          <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'洗脸'</span>);
+        }
+      }
+    ])</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="ZxrEa"><a class="lake-anchor" href="#ZxrEa"></a>after - 在多少次之后执行</h2>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20after(times%2Ccallback)%7B%5Cn%20%20%20%20let%20total%20%3D0%3B%5Cn%20%20%20%20return%20function(a)%7B%5Cn%20%20%20%20%20%20%20%20total%2B%3Da%5Cn%20%20%20%20%20%20%20%20if(--times%20%3D%3D%200)%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20callback(total)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%7D%5Cn%5Cnlet%20fn%20%3D%20after(3%2Cfunction(total)%7B%20%2F%2F%20%E5%BD%93%E8%BE%BE%E5%88%B0%E9%A2%84%E8%AE%A1%E7%9A%84%E6%AC%A1%E6%95%B0%20%E6%89%A7%E8%A1%8C%E6%9F%90%E4%B8%AA%E5%87%BD%E6%95%B0%5Cn%20%20%20%20console.log('after'%2Ctotal)%3B%5Cn%7D)%3B%5Cn%5Cn%2F%2F%20%E8%A7%A3%E5%86%B3%E5%BC%82%E6%AD%A5%E9%97%AE%E9%A2%98%5Cnfn(1)%3B%5Cnfn(2)%3B%5Cnfn(3)%3B%22%2C%22id%22%3A%22nCuQL%22%7D"
+              id="nCuQL">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">after</span>(<span class="cm-def">times</span>,<span class="cm-def">callback</span>){
+        <span class="cm-keyword">let</span> <span class="cm-def">total</span> <span class="cm-operator">=</span><span class="cm-number">0</span>;
+        <span class="cm-keyword">return</span> <span class="cm-keyword">function</span>(<span class="cm-def">a</span>){
+            <span class="cm-variable-2">total</span><span class="cm-operator">+=</span><span class="cm-variable-2">a</span>
+            <span class="cm-keyword">if</span>(<span class="cm-operator">--</span><span class="cm-variable-2">times</span> <span class="cm-operator">==</span> <span class="cm-number">0</span>){
+                <span class="cm-variable-2">callback</span>(<span class="cm-variable-2">total</span>);
+            }
+        }
+    }
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">fn</span> <span class="cm-operator">=</span> <span class="cm-variable">after</span>(<span class="cm-number">3</span>,<span class="cm-keyword">function</span>(<span class="cm-def">total</span>){ <span class="cm-comment">// 当达到预计的次数 执行某个函数</span>
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'after'</span>,<span class="cm-variable-2">total</span>);
+    });
+    
+    <span class="cm-comment">// 解决异步问题</span>
+    <span class="cm-variable">fn</span>(<span class="cm-number">1</span>);
+    <span class="cm-variable">fn</span>(<span class="cm-number">2</span>);
+    <span class="cm-variable">fn</span>(<span class="cm-number">3</span>);</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="caotK"><a class="lake-anchor" href="#caotK"></a><br></h3>
+            <h2 id="GnsPp"><a class="lake-anchor" href="#GnsPp"></a>计数 - 到达指定的次数就执行</h2>
+            <p><br></p>
+            <blockquote>
+              <p><span>这里的计数一定不能用arr的长度去做判断，因为对于 arr[1] = 1&nbsp;这种先执行的情况，arr的length就直接变成2了</span></p>
+            </blockquote>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20fs%20%3D%20require('fs')%3B%5Cnlet%20arr%20%3D%20%5B%5D%3B%20%2F%2F%20%E4%BF%9D%E8%AF%81%E9%A1%BA%E5%BA%8F%E7%BB%9F%E4%B8%80%5Cnlet%20i%20%3D%200%3B%5Cnfunction%20fn(data%2Cindex)%7B%5Cn%20%20%20%20arr%5Bindex%5D%20%3D%20data%3B%5Cn%20%20%20%20if(%2B%2Bi%20%3D%3D%202)%7B%5Cn%20%20%20%20%20%20%20%20console.log(arr)%3B%5Cn%20%20%20%20%7D%5Cn%7D%5Cn%5Cnfs.readFile('.%2Fname.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%5Cn%20%20%20%20fn(data%2C1)%3B%20%2F%2F%20%E6%AF%8F%E4%B8%AA%E5%BC%82%E6%AD%A5%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E5%AE%8C%E5%90%8E%20%E8%B0%83%E7%94%A8%E4%B8%80%E4%B8%AA%E5%9B%9E%E8%B0%83%E9%80%9A%E7%9F%A5%E5%AE%8C%E6%88%90%E4%BA%86%EF%BC%8C%E5%B0%86%E7%BB%93%E6%9E%9C%E4%BC%A0%E5%85%A5%5Cn%7D)%3B%5Cn%5Cnfs.readFile('.%2Fage.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%5Cn%20%20%20%20fn(data%2C0)%3B%5Cn%7D)%3B%22%2C%22id%22%3A%22hW0D9%22%7D"
+              id="hW0D9">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">fs</span> <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">'fs'</span>);
+    <span class="cm-keyword">let</span> <span class="cm-def">arr</span> <span class="cm-operator">=</span> []; <span class="cm-comment">// 保证顺序统一</span>
+    <span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+    <span class="cm-keyword">function</span> <span class="cm-def">fn</span>(<span class="cm-def">data</span>,<span class="cm-def">index</span>){
+        <span class="cm-variable">arr</span>[<span class="cm-variable-2">index</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">data</span>;
+        <span class="cm-keyword">if</span>(<span class="cm-operator">++</span><span class="cm-variable">i</span> <span class="cm-operator">==</span> <span class="cm-number">2</span>){
+            <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">arr</span>);
+        }
+    }
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./name.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){
+        <span class="cm-variable">fn</span>(<span class="cm-variable-2">data</span>,<span class="cm-number">1</span>); <span class="cm-comment">// 每个异步函数执行完后 调用一个回调通知完成了，将结果传入</span>
+    });
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./age.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){
+        <span class="cm-variable">fn</span>(<span class="cm-variable-2">data</span>,<span class="cm-number">0</span>);
+    });</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h2 id="3gw4q"><a class="lake-anchor" href="#3gw4q"></a>after 与 计数 组合</h2>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20fs%20%3D%20require('fs')%3B%5Cnfunction%20after(times%2Ccallback)%7B%20%2F%2F%20%E4%BD%BF%E7%94%A8after%E5%87%BD%E6%95%B0%20%E5%8F%AF%E4%BB%A5%E7%AE%80%E5%8C%96%E5%BC%82%E6%AD%A5%E6%93%8D%E4%BD%9C%5Cn%20%20%20%20let%20arr%20%3D%20%5B%5D%3B%5Cn%20%20%20%20return%20function(err%2Cr)%7B%5Cn%20%20%20%20%20%20%20%20if(err)%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20throw%20new%20Error(err)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20arr.push(r)%3B%20%2F%2F%20%E6%8A%8A%E7%BB%93%E6%9E%9C%E4%BC%A0%E9%80%92%E5%88%B0%E5%AF%B9%E5%BA%94%E7%9A%84callback%E4%B8%AD%5Cn%20%20%20%20%20%20%20%20if(--times%20%3D%3D%3D%200)%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20callback(arr)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%7D%5Cn%5Cnlet%20newFn%20%3D%20after(3%2Cfunction(arr)%7B%5Cn%20%20%20%20console.log(arr)%3B%20%2F%2F%20%E5%BD%93%E5%BC%82%E6%AD%A5%E5%AE%8C%E6%88%90%E5%90%8E%E8%A7%A6%E5%8F%91%E6%AD%A4%E6%96%B9%E6%B3%95%5Cn%7D)%3B%5Cn%5Cnfs.readFile('.%2Fname1.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%205s%5Cn%20%20%20%20newFn(err%2Cdata)%3B%20%20%2F%2F%20%E9%94%99%E8%AF%AF%E4%BC%98%E5%85%88%20%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%8F%82%E6%95%B0%E6%B0%B8%E8%BF%9C%E6%98%AF%E9%94%99%E8%AF%AF%5Cn%7D)%3B%5Cn%5Cnfs.readFile('.%2Fage.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%203s%5Cn%20%20%20%20newFn(err%2Cdata)%3B%5Cn%7D)%3B%5Cn%5Cnfs.readFile('.%2Fage.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%203s%5Cn%20%20%20%20newFn(err%2Cdata)%3B%5Cn%7D)%3B%5Cn%2F%2F%20compose%5Cn%2F%2F%20%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F%20redux%20promise%22%2C%22id%22%3A%22rgkRE%22%7D"
+              id="rgkRE">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">fs</span> <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">'fs'</span>);
+    <span class="cm-keyword">function</span> <span class="cm-def">after</span>(<span class="cm-def">times</span>,<span class="cm-def">callback</span>){ <span class="cm-comment">// 使用after函数 可以简化异步操作</span>
+        <span class="cm-keyword">let</span> <span class="cm-def">arr</span> <span class="cm-operator">=</span> [];
+        <span class="cm-keyword">return</span> <span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">r</span>){
+            <span class="cm-keyword">if</span>(<span class="cm-variable-2">err</span>){
+                <span class="cm-keyword">throw</span> <span class="cm-keyword">new</span> <span class="cm-variable">Error</span>(<span class="cm-variable-2">err</span>);
+            }
+            <span class="cm-variable-2">arr</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">r</span>); <span class="cm-comment">// 把结果传递到对应的callback中</span>
+            <span class="cm-keyword">if</span>(<span class="cm-operator">--</span><span class="cm-variable-2">times</span> <span class="cm-operator">===</span> <span class="cm-number">0</span>){
+                <span class="cm-variable-2">callback</span>(<span class="cm-variable-2">arr</span>);
+            }
+        }
+    }
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">newFn</span> <span class="cm-operator">=</span> <span class="cm-variable">after</span>(<span class="cm-number">3</span>,<span class="cm-keyword">function</span>(<span class="cm-def">arr</span>){
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">arr</span>); <span class="cm-comment">// 当异步完成后触发此方法</span>
+    });
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./name1.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 5s</span>
+        <span class="cm-variable">newFn</span>(<span class="cm-variable-2">err</span>,<span class="cm-variable-2">data</span>);  <span class="cm-comment">// 错误优先 第一个参数永远是错误</span>
+    });
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./age.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 3s</span>
+        <span class="cm-variable">newFn</span>(<span class="cm-variable-2">err</span>,<span class="cm-variable-2">data</span>);
+    });
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./age.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 3s</span>
+        <span class="cm-variable">newFn</span>(<span class="cm-variable-2">err</span>,<span class="cm-variable-2">data</span>);
+    });
+    <span class="cm-comment">// compose</span>
+    <span class="cm-comment">// 发布订阅模式 redux promise</span></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>两者结合的写法，使得异步代码变得简洁、优雅</p>
+            </blockquote>
+            <p><br></p>
+            <h2 id="Qk4Ii"><a class="lake-anchor" href="#Qk4Ii"></a>发布订阅</h2>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20fs%20%3D%20require('fs')%3B%5Cn%5Cnfunction%20Events()%7B%20%2F%2F%20redux%20promise%20%5Cn%20%20%20%20this.callbacks%20%3D%20%5B%5D%3B%5Cn%20%20%20%20this.results%20%3D%20%5B%5D%3B%5Cn%7D%5Cn%5CnEvents.prototype.on%20%3D%20function(callback)%7B%20%2F%2F%20%E8%AE%A2%E9%98%85%5Cn%20%20%20%20this.callbacks.push(callback)%3B%5Cn%7D%5Cn%5CnEvents.prototype.emit%20%3D%20function(data)%7B%20%2F%2F%20%E5%8F%91%E5%B8%83%5Cn%20%20%20%20this.results.push(data)%3B%5Cn%20%20%20%20this.callbacks.forEach(c%3D%3Ec(this.results))%3B%5Cn%7D%5Cn%5Cnlet%20e%20%3D%20new%20Events()%3B%5Cne.on(function(arr)%7B%5Cn%20%20%20%20if(arr.length%20%3D%3D%3D%203)%7B%5Cn%20%20%20%20%20%20%20%20console.log(arr)%3B%5Cn%20%20%20%20%7D%5Cn%7D)%5Cn%5Cnfs.readFile('.%2Fname.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%205s%5Cn%20%20%20%20e.emit(data)%5Cn%7D)%3B%5Cn%5Cn%5Cnfs.readFile('.%2Fage.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%203s%5Cn%20%20%20%20e.emit(data)%5Cn%7D)%3B%5Cnfs.readFile('.%2Fage.txt'%2C'utf8'%2Cfunction(err%2Cdata)%7B%20%2F%2F%203s%5Cn%20%20%20%20e.emit(data)%5Cn%7D)%3B%5Cn%22%2C%22id%22%3A%22Rf7Js%22%7D"
+              id="Rf7Js">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">fs</span> <span class="cm-operator">=</span> <span class="cm-variable">require</span>(<span class="cm-string">'fs'</span>);
+    
+    <span class="cm-keyword">function</span> <span class="cm-def">Events</span>(){ <span class="cm-comment">// redux promise </span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">callbacks</span> <span class="cm-operator">=</span> [];
+        <span class="cm-keyword">this</span>.<span class="cm-property">results</span> <span class="cm-operator">=</span> [];
+    }
+    
+    <span class="cm-variable">Events</span>.<span class="cm-property">prototype</span>.<span class="cm-property">on</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">callback</span>){ <span class="cm-comment">// 订阅</span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">callbacks</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">callback</span>);
+    }
+    
+    <span class="cm-variable">Events</span>.<span class="cm-property">prototype</span>.<span class="cm-property">emit</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">data</span>){ <span class="cm-comment">// 发布</span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">results</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">data</span>);
+        <span class="cm-keyword">this</span>.<span class="cm-property">callbacks</span>.<span class="cm-property">forEach</span>(<span class="cm-def">c</span><span class="cm-operator">=&gt;</span><span class="cm-variable-2">c</span>(<span class="cm-keyword">this</span>.<span class="cm-property">results</span>));
+    }
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">e</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Events</span>();
+    <span class="cm-variable">e</span>.<span class="cm-property">on</span>(<span class="cm-keyword">function</span>(<span class="cm-def">arr</span>){
+        <span class="cm-keyword">if</span>(<span class="cm-variable-2">arr</span>.<span class="cm-property">length</span> <span class="cm-operator">===</span> <span class="cm-number">3</span>){
+            <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">arr</span>);
+        }
+    })
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./name.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 5s</span>
+        <span class="cm-variable">e</span>.<span class="cm-property">emit</span>(<span class="cm-variable-2">data</span>)
+    });
+    
+    
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./age.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 3s</span>
+        <span class="cm-variable">e</span>.<span class="cm-property">emit</span>(<span class="cm-variable-2">data</span>)
+    });
+    <span class="cm-variable">fs</span>.<span class="cm-property">readFile</span>(<span class="cm-string">'./age.txt'</span>,<span class="cm-string">'utf8'</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>,<span class="cm-def">data</span>){ <span class="cm-comment">// 3s</span>
+        <span class="cm-variable">e</span>.<span class="cm-property">emit</span>(<span class="cm-variable-2">data</span>)
+    });
+    </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h2 id="KPIak"><a class="lake-anchor" href="#KPIak"></a>观察者模式</h2>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22class%20Subject%20%7B%5Cn%20%20%20%20constructor(name)%7B%5Cn%20%20%20%20%20%20%20%20this.name%20%3D%20name%3B%5Cn%20%20%20%20%20%20%20%20this.observers%20%3D%20%5B%5D%3B%20%2F%2F%E8%A7%82%E5%AF%9F%E8%80%85%20%E8%A6%81%E5%AD%98%E6%94%BE%E5%88%B0%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E4%B8%AD%5Cn%20%20%20%20%20%20%20%20this.state%20%3D%20'%E5%BF%83%E6%83%85%E5%BE%88%E7%BE%8E%E4%B8%BD'%5Cn%20%20%20%20%7D%5Cn%20%20%20%20%2F%2F%20%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E8%A6%81%E6%8F%90%E4%BE%9B%E4%B8%80%E4%B8%AA%E6%8E%A5%E5%8F%97%E8%A7%82%E5%AF%9F%E8%80%85%E7%9A%84%E6%96%B9%E6%B3%95%5Cn%20%20%20%20attach(observer)%7B%5Cn%20%20%20%20%20%20%20%20this.observers.push(observer)%3B%20%2F%2F%20%E5%AD%98%E6%94%BE%E6%89%80%E6%9C%89%E7%9A%84%E8%A7%82%E5%AF%9F%E8%80%85%5Cn%20%20%20%20%7D%5Cn%20%20%20%20setState(newState)%7B%20%2F%2F%20%E6%9B%B4%E6%94%B9%E8%A2%AB%E8%A7%82%E5%AF%9F%E8%80%85%E7%9A%84%E7%8A%B6%E6%80%81%5Cn%20%20%20%20%20%20%20%20this.state%20%3D%20newState%3B%5Cn%20%20%20%20%20%20%20%20this.observers.forEach(o%3D%3Eo.update(newState))%3B%5Cn%20%20%20%20%7D%5Cn%7D%20%5Cnclass%20Observer%7B%5Cn%20%20%20%20constructor(name)%7B%5Cn%20%20%20%20%20%20%20%20this.name%20%3D%20name%3B%5Cn%20%20%20%20%7D%5Cn%20%20%20%20update(newState)%7B%20%2F%2F%20%E7%94%A8%E6%9D%A5%E9%80%9A%E7%9F%A5%E6%89%80%E6%9C%89%E7%9A%84%E8%A7%82%E5%AF%9F%E8%80%85%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E4%BA%86%5Cn%20%20%20%20%20%20%20%20console.log(this.name%2B'%E8%AF%B4%EF%BC%9A%E5%AE%9D%E5%AE%9D'%2BnewState)%3B%5Cn%20%20%20%20%7D%5Cn%7D%5Cnlet%20sub%20%3D%20new%20Subject('%E5%B0%8F%E5%AE%9D%E5%AE%9D')%3B%5Cnlet%20o1%20%3D%20new%20Observer('%E7%88%B8%E7%88%B8')%3B%5Cnlet%20o2%20%3D%20new%20Observer('%E5%A6%88%E5%A6%88')%3B%5Cnsub.attach(o1)%3B%5Cnsub.attach(o2)%3B%5Cnsub.setState('%E5%BF%83%E6%83%85%E4%B8%8D%E5%A5%BD%E4%BA%86')%3B%5Cnsub.setState('%E5%BF%83%E6%83%85%E4%B8%8D%E5%A5%BD%E4%BA%861')%5Cn%5Cn%5Cn%2F%2F%201)%20%E5%BC%82%E6%AD%A5%E7%9A%84%E7%BC%BA%E9%99%B7%5Cn%2F%2F%20%20%E5%9B%9E%E8%B0%83%E5%8F%AF%E8%83%BD%E4%BC%9A%E5%AF%BC%E8%87%B4%E4%BB%A3%E7%A0%81%E4%B8%8D%E5%A5%BD%E7%BB%B4%E6%8A%A4%20%E5%AF%BC%E8%87%B4%E6%81%B6%E9%AD%94%E9%87%91%E5%AD%90%E5%A1%94%20%E5%9B%9E%E8%B0%83%E5%9C%B0%E7%8B%B1%5Cn%2F%2F%20%20%E9%94%99%E8%AF%AF%E9%97%AE%E9%A2%98%20%E4%B8%8D%E5%A5%BD%E6%8D%95%E8%8E%B7%E9%94%99%E8%AF%AF%20%E4%B8%8D%E8%83%BD%E4%BD%BF%E7%94%A8try-catch%5Cn%2F%2F%20%20%E5%90%8C%E6%AD%A5%E2%80%9C%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E2%80%9C%E9%9C%80%E8%A6%81%E8%87%AA%E5%B7%B1%E7%BB%B4%E6%8A%A4%E8%AE%A1%E6%95%B0%E5%99%A8%20%5Cn%2F%2F%20%20%E4%BB%A3%E7%A0%81%E4%B8%8D%E4%BC%98%E9%9B%85%5Cn%5Cn%2F%2F%20promise%20%22%2C%22id%22%3A%22J42mI%22%7D"
+              id="J42mI">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">class</span> <span class="cm-def">Subject</span> {
+        <span class="cm-property">constructor</span>(<span class="cm-def">name</span>){
+            <span class="cm-keyword">this</span>.<span class="cm-property">name</span> <span class="cm-operator">=</span> <span class="cm-variable-2">name</span>;
+            <span class="cm-keyword">this</span>.<span class="cm-property">observers</span> <span class="cm-operator">=</span> []; <span class="cm-comment">//观察者 要存放到被观察者中</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">state</span> <span class="cm-operator">=</span> <span class="cm-string">'心情很美丽'</span>
+        }
+        <span class="cm-comment">// 被观察者要提供一个接受观察者的方法</span>
+        <span class="cm-property">attach</span>(<span class="cm-def">observer</span>){
+            <span class="cm-keyword">this</span>.<span class="cm-property">observers</span>.<span class="cm-property">push</span>(<span class="cm-variable-2">observer</span>); <span class="cm-comment">// 存放所有的观察者</span>
+        }
+        <span class="cm-property">setState</span>(<span class="cm-def">newState</span>){ <span class="cm-comment">// 更改被观察者的状态</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">state</span> <span class="cm-operator">=</span> <span class="cm-variable-2">newState</span>;
+            <span class="cm-keyword">this</span>.<span class="cm-property">observers</span>.<span class="cm-property">forEach</span>(<span class="cm-def">o</span><span class="cm-operator">=&gt;</span><span class="cm-variable-2">o</span>.<span class="cm-property">update</span>(<span class="cm-variable-2">newState</span>));
+        }
+    } 
+    <span class="cm-keyword">class</span> <span class="cm-def">Observer</span>{
+        <span class="cm-property">constructor</span>(<span class="cm-def">name</span>){
+            <span class="cm-keyword">this</span>.<span class="cm-property">name</span> <span class="cm-operator">=</span> <span class="cm-variable-2">name</span>;
+        }
+        <span class="cm-property">update</span>(<span class="cm-def">newState</span>){ <span class="cm-comment">// 用来通知所有的观察者状态更新了</span>
+            <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-keyword">this</span>.<span class="cm-property">name</span><span class="cm-operator">+</span><span class="cm-string">'说：宝宝'</span><span class="cm-operator">+</span><span class="cm-variable-2">newState</span>);
+        }
+    }
+    <span class="cm-keyword">let</span> <span class="cm-def">sub</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Subject</span>(<span class="cm-string">'小宝宝'</span>);
+    <span class="cm-keyword">let</span> <span class="cm-def">o1</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Observer</span>(<span class="cm-string">'爸爸'</span>);
+    <span class="cm-keyword">let</span> <span class="cm-def">o2</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Observer</span>(<span class="cm-string">'妈妈'</span>);
+    <span class="cm-variable">sub</span>.<span class="cm-property">attach</span>(<span class="cm-variable">o1</span>);
+    <span class="cm-variable">sub</span>.<span class="cm-property">attach</span>(<span class="cm-variable">o2</span>);
+    <span class="cm-variable">sub</span>.<span class="cm-property">setState</span>(<span class="cm-string">'心情不好了'</span>);
+    <span class="cm-variable">sub</span>.<span class="cm-property">setState</span>(<span class="cm-string">'心情不好了1'</span>)
+    
+    
+    <span class="cm-comment">// 1) 异步的缺陷</span>
+    <span class="cm-comment">//  回调可能会导致代码不好维护 导致恶魔金子塔 回调地狱</span>
+    <span class="cm-comment">//  错误问题 不好捕获错误 不能使用try-catch</span>
+    <span class="cm-comment">//  同步“异步请求“需要自己维护计数器 </span>
+    <span class="cm-comment">//  代码不优雅</span>
+    
+    <span class="cm-comment">// promise </span></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <h5>发布订阅和观察者模式的区别：</h5>
+              <p style="text-indent: 2em;">
+                <span>发布订阅从语义上就可以区分出，有发布和订阅两个动作；但是它们没有直接联系。它们通过中间层完成各自的任务。这个中间层，在订阅（on）时，存放订阅的事件；发布时（emit），就把存的所有事件全都执行一遍。</span>
+              </p>
+              <p style="text-indent: 2em;"><br></p>
+              <p style="text-indent: 2em;">
+                而观察者模式包含发布订阅。观察者模式可以抽出两个角色类，一个是观察者，一个是被观察者；被观察者需要提供一个给观察者使用的方法，将观察者存放在被观察者中；每当被观察者的状态发生改变，都会触发观察者的一个方法来通知。两者联系紧密，而且包含了发布订阅在里面。
+              </p>
+            </blockquote>
+            <p><br></p>
+            <h2 id="NVayh"><a class="lake-anchor" href="#NVayh"></a>callback 世界遗留的问题</h2>
+            <ul>
+              <li>回调可能会导致代码不好维护，如回调地狱</li>
+              <li>不能使用try-catch捕获错误（try-catch只能捕获同步代码的异常问题）</li>
+              <li>同步“异步请求“需要自己维护计数器</li>
+              <li>代码不优雅</li>
+            </ul>
+            <p><br></p>
+            <p><br></p>
+            <h1 id="6nvlU"><a class="lake-anchor" href="#6nvlU"></a>Promise</h1>
+            <p><br></p>
+            <h2 id="oOfRj"><a class="lake-anchor" href="#oOfRj"></a>使用场景</h2>
+            <p><br></p>
+            <h3 id="J8ghf"><a class="lake-anchor" href="#J8ghf"></a>1. 同步调用</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Ctresolve(1)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%5Ctconsole.log(res)%5Cn%7D)%22%2C%22id%22%3A%22imd9s%22%7D"
+              id="imd9s">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">res</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="RxMUk"><a class="lake-anchor" href="#RxMUk"></a>2. 错误捕获</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%20%20throw%20Error('%E6%88%91%E9%94%99%E4%BA%86')%5Cn%5Ctresolve(1)%5Cn%7D)%22%2C%22id%22%3A%22XttHj%22%7D"
+              id="XttHj">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-keyword">throw</span> <span class="cm-variable">Error</span>(<span class="cm-string">'我错了'</span>)
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="cNRy1"><a class="lake-anchor" href="#cNRy1"></a>3. 异步调用</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5CtsetTimeout(()%20%3D%3E%20%7B%5Cn%20%20%5Ct%5Ctresolve(1)%5Cn%20%20%7D%2C%201000)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%5Ctconsole.log(res)%5Cn%7D)%22%2C%22id%22%3A%22Rwk8c%22%7D"
+              id="Rwk8c">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+          <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+      }, <span class="cm-number">1000</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">res</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="kR8cT"><a class="lake-anchor" href="#kR8cT"></a>4. 链式调用</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Ctresolve(1)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%5Ctconsole.log(res)%5Cn%7D).then(()%20%3D%3E%20%7B%5Cn%5Ctconsole.log('%E7%BB%A7%E7%BB%AD%E6%89%A7%E8%A1%8C')%5Cn%7D)%22%2C%22id%22%3A%22UgcXN%22%7D"
+              id="UgcXN">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">res</span>)
+    }).<span class="cm-property">then</span>(() <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'继续执行'</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="p2et2"><a class="lake-anchor" href="#p2et2"></a>5. 值传递和穿透</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Ctresolve(1)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20res)%5Cn%20%20.then(result%20%3D%3E%20%7B%5Cn%20%20%20%20console.log(result)%20%2F%2F%201%20%E5%80%BC%E4%BC%A0%E9%80%92%5Cn%20%20%20%20return%20result%20%2F%2F%20%E7%BB%A7%E7%BB%AD%E4%BC%A0%E9%80%92%5Cn%20%20%7D)%5Cn%20%20.then()%20%2F%2F%20%E7%A9%BF%E9%80%8F%E4%B8%80%E5%B1%82%5Cn%20%20.then(value%20%3D%3E%20%7B%5Cn%20%20%20%20console.log(value)%20%2F%2F%20%E8%BF%98%E8%83%BD%E6%8B%BF%E5%88%B0%201%5Cn%20%20%7D)%22%2C%22id%22%3A%22RCNNO%22%7D"
+              id="RCNNO">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">res</span>)
+      .<span class="cm-property">then</span>(<span class="cm-def">result</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">result</span>) <span class="cm-comment">// 1 值传递</span>
+        <span class="cm-keyword">return</span> <span class="cm-variable-2">result</span> <span class="cm-comment">// 继续传递</span>
+      })
+      .<span class="cm-property">then</span>() <span class="cm-comment">// 穿透一层</span>
+      .<span class="cm-property">then</span>(<span class="cm-def">value</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">value</span>) <span class="cm-comment">// 还能拿到 1</span>
+      })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="Io2bX"><a class="lake-anchor" href="#Io2bX"></a>6. 值传递时，再传递个 Promise</h3>
+            <p><br></p>
+            <p><strong>在 then 里传递</strong></p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%20%20resolve(1)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%20%20return%20new%20Promise(resolve%20%3D%3E%20%7B%5Cn%20%20%20%20resolve(1)%5Cn%20%20%7D)%5Cn%7D).then(result%20%3D%3E%20%7B%5Cn%5Ctconsole.log(result)%20%2F%2F%201%5Cn%7D)%22%2C%22id%22%3A%22losw8%22%7D"
+              id="losw8">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>(<span class="cm-def">resolve</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+      })
+    }).<span class="cm-property">then</span>(<span class="cm-def">result</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">result</span>) <span class="cm-comment">// 1</span>
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><strong>在 resolve 里传递</strong></p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%20%20resolve(new%20Promise(resolve%20%3D%3E%20%7B%5Cn%20%20%20%20resolve(1)%5Cn%20%20%7D)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%5Ctconsole.log(res)%20%2F%2F%201%5Cn%7D)%22%2C%22id%22%3A%22A3H0t%22%7D"
+              id="A3H0t">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>(<span class="cm-def">resolve</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+      })
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">res</span>) <span class="cm-comment">// 1</span>
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h3 id="VHNs2"><a class="lake-anchor" href="#VHNs2"></a><span>7. then 里的两个函数只能调用一个</span></h3>
+            <p><br></p>
+            <blockquote>
+              <p>then 里面成功和错误的回调只能执行一个</p>
+            </blockquote>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Ctresolve(1)%5Cn%7D)%5Cn%5Cnp.then(res%20%3D%3E%20%7B%5Cn%5Ctconsole.log(res)%5Cn%7D%2C%20err%20%3D%3E%20%7B%5Cn%5Ctconsole.log(err)%5Cn%7D)%22%2C%22id%22%3A%22jOTeK%22%7D"
+              id="jOTeK">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>(<span class="cm-number">1</span>)
+    })
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">res</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">res</span>)
+    }, <span class="cm-def">err</span> <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">err</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="xmQmm"><a class="lake-anchor" href="#xmQmm"></a>Promise A+ 规范实现</h2>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20resolvePromise(p2%2C%20x%2C%20resolve%2C%20reject)%20%7B%5Cn%20%20if%20(p2%20%3D%3D%3D%20x)%20return%20reject(new%20TypeError('%E8%87%AA%E5%B7%B1%E7%AD%89%E8%87%AA%E5%B7%B1%EF%BC%8C%E4%BD%A0%E6%98%AF%E4%B8%8D%E6%98%AF%E5%82%BB'))%5Cn%20%20if%20(typeof%20x%20%3D%3D%3D%20'function'%20%7C%7C%20(typeof%20x%20%3D%3D%3D%20'object'%20%26%26%20x%20!%3D%3D%20null))%20%7B%5Cn%20%20%20%20let%20called%5Cn%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20let%20then%20%3D%20x.then%5Cn%20%20%20%20%20%20if%20(typeof%20then%20%3D%3D%3D%20'function')%20%7B%5Cn%20%20%20%20%20%20%20%20then.call(x%2C%20y%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20if%20(called)%20return%5Cn%20%20%20%20%20%20%20%20%20%20called%20%3D%20true%5Cn%20%20%20%20%20%20%20%20%20%20resolvePromise(p2%2C%20y%2C%20resolve%2C%20reject)%5Cn%20%20%20%20%20%20%20%20%7D%2C%20r%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20if%20(called)%20return%5Cn%20%20%20%20%20%20%20%20%20%20called%20%3D%20true%5Cn%20%20%20%20%20%20%20%20%20%20reject(r)%5Cn%20%20%20%20%20%20%20%20%7D)%5Cn%20%20%20%20%20%20%7D%20else%20%7B%5Cn%20%20%20%20%20%20%20%20resolve(x)%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20if%20(called)%20return%3B%5Cn%20%20%20%20%20%20called%20%3D%20true%3B%5Cn%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%7D%5Cn%20%20%7D%20else%20%7B%5Cn%20%20%20%20resolve(x)%5Cn%20%20%7D%5Cn%7D%5Cn%5Cnclass%20Promise%20%7B%5Cn%20%20constructor(excetor)%20%7B%5Cn%20%20%20%20this.status%20%3D%20'pedding'%5Cn%20%20%20%20this.value%5Cn%20%20%20%20this.reason%5Cn%20%20%20%20this.resolveEvents%20%3D%20%5B%5D%5Cn%20%20%20%20this.rejectEvents%20%3D%20%5B%5D%5Cn%5Cn%20%20%20%20let%20resolve%20%3D%20v%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20if%20(v%20instanceof%20Promise)%7B%5Cn%20%20%20%20%20%20%20%20return%20v.then(resolve%2C%20reject)%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20if%20(this.status%20%3D%3D%3D%20'pedding')%20%7B%5Cn%20%20%20%20%20%20%20%20this.status%20%3D%20'fulfilled'%5Cn%20%20%20%20%20%20%20%20this.value%20%3D%20v%5Cn%20%20%20%20%20%20%20%20this.resolveEvents.forEach(v%20%3D%3E%20v())%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%5Cn%20%20%20%20let%20reject%20%3D%20v%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20if%20(this.status%20%3D%3D%3D%20'pedding')%20%7B%5Cn%20%20%20%20%20%20%20%20this.status%20%3D%20'rejected'%5Cn%20%20%20%20%20%20%20%20this.reason%20%3D%20v%5Cn%20%20%20%20%20%20%20%20this.rejectEvents.forEach(v%20%3D%3E%20v())%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%5Cn%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20excetor(resolve%2C%20reject)%5Cn%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%7D%5Cn%20%20%7D%5Cn%20%20then(onFulfilled%2C%20onRejected)%20%7B%5Cn%20%20%20%20onFulfilled%20%3D%20typeof%20onFulfilled%20%3D%3D%3D%20'function'%20%3F%20onFulfilled%20%3A%20v%20%3D%3E%20v%5Cn%20%20%20%20onRejected%20%3D%20typeof%20onRejected%20%3D%3D%3D%20'function'%20%3F%20onRejected%20%3A%20v%20%3D%3E%20%7B%20throw%20v%20%7D%5Cn%5Cn%20%20%20%20let%20p2%5Cn%20%20%20%20p2%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Cn%20%20%20%20%20%20if%20(this.status%20%3D%3D%3D%20'fulfilled')%20%7B%5Cn%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20let%20x%20%3D%20onFulfilled(this.value)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20resolvePromise(p2%2C%20x%2C%20resolve%2C%20reject)%5Cn%20%20%20%20%20%20%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7D%2C%200)%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20if%20(this.status%20%3D%3D%3D%20'rejected')%20%7B%5Cn%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20let%20x%20%3D%20onRejected(this.reason)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20resolvePromise(p2%2C%20x%2C%20resolve%2C%20reject)%5Cn%20%20%20%20%20%20%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7D%2C%200)%5Cn%20%20%20%20%20%20%7D%5Cn%5Cn%20%20%20%20%20%20if%20(this.status%20%3D%3D%3D%20'pedding')%20%7B%5Cn%20%20%20%20%20%20%20%20this.resolveEvents.push(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20let%20x%20%3D%20onFulfilled(this.value)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolvePromise(p2%2C%20x%2C%20resolve%2C%20reject)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%20%20%7D%2C%200)%5Cn%20%20%20%20%20%20%20%20%7D)%5Cn%20%20%20%20%20%20%20%20this.rejectEvents.push(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20try%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20let%20x%20%3D%20onRejected(this.reason)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20resolvePromise(p2%2C%20x%2C%20resolve%2C%20reject)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%20catch%20(error)%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20reject(error)%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%20%20%7D%2C%200)%5Cn%20%20%20%20%20%20%20%20%7D)%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D)%5Cn%20%20%20%20return%20p2%5Cn%20%20%7D%5Cn%7D%5Cn%5Cn%2F%2F%20%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81%EF%BC%8C%E7%94%A8%20promises-aplus-tests%20%E4%BE%9D%E8%B5%96%E6%B5%8B%5CnPromise.defer%20%3D%20Promise.deferred%20%3D%20function%20()%20%7B%5Cn%20%20let%20dfd%20%3D%20%7B%7D%5Cn%20%20dfd.promise%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%20%20%20%20dfd.resolve%20%3D%20resolve%3B%5Cn%20%20%20%20dfd.reject%20%3D%20reject%3B%5Cn%20%20%7D)%5Cn%20%20return%20dfd%3B%5Cn%7D%5Cn%5Cnmodule.exports%20%3D%20Promise%5Cn%22%2C%22id%22%3A%225p5EA%22%7D"
+              id="5p5EA">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">resolvePromise</span>(<span class="cm-def">p2</span>, <span class="cm-def">x</span>, <span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) {
+      <span class="cm-keyword">if</span> (<span class="cm-variable-2">p2</span> <span class="cm-operator">===</span> <span class="cm-variable-2">x</span>) <span class="cm-keyword">return</span> <span class="cm-variable-2">reject</span>(<span class="cm-keyword">new</span> <span class="cm-variable">TypeError</span>(<span class="cm-string">'自己等自己，你是不是傻'</span>))
+      <span class="cm-keyword">if</span> (<span class="cm-keyword">typeof</span> <span class="cm-variable-2">x</span> <span class="cm-operator">===</span> <span class="cm-string">'function'</span> <span class="cm-operator">|</span><span class="cm-operator">|</span> (<span class="cm-keyword">typeof</span> <span class="cm-variable-2">x</span> <span class="cm-operator">===</span> <span class="cm-string">'object'</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span> <span class="cm-variable-2">x</span> <span class="cm-operator">!==</span> <span class="cm-atom">null</span>)) {
+        <span class="cm-keyword">let</span> <span class="cm-def">called</span>
+        <span class="cm-keyword">try</span> {
+          <span class="cm-keyword">let</span> <span class="cm-def">then</span> <span class="cm-operator">=</span> <span class="cm-variable-2">x</span>.<span class="cm-property">then</span>
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">typeof</span> <span class="cm-variable-2">then</span> <span class="cm-operator">===</span> <span class="cm-string">'function'</span>) {
+            <span class="cm-variable-2">then</span>.<span class="cm-property">call</span>(<span class="cm-variable-2">x</span>, <span class="cm-def">y</span> <span class="cm-operator">=&gt;</span> {
+              <span class="cm-keyword">if</span> (<span class="cm-variable-2">called</span>) <span class="cm-keyword">return</span>
+              <span class="cm-variable-2">called</span> <span class="cm-operator">=</span> <span class="cm-atom">true</span>
+              <span class="cm-variable">resolvePromise</span>(<span class="cm-variable-2">p2</span>, <span class="cm-variable-2">y</span>, <span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+            }, <span class="cm-def">r</span> <span class="cm-operator">=&gt;</span> {
+              <span class="cm-keyword">if</span> (<span class="cm-variable-2">called</span>) <span class="cm-keyword">return</span>
+              <span class="cm-variable-2">called</span> <span class="cm-operator">=</span> <span class="cm-atom">true</span>
+              <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">r</span>)
+            })
+          } <span class="cm-keyword">else</span> {
+            <span class="cm-variable-2">resolve</span>(<span class="cm-variable-2">x</span>)
+          }
+        } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+          <span class="cm-keyword">if</span> (<span class="cm-variable-2">called</span>) <span class="cm-keyword">return</span>;
+          <span class="cm-variable-2">called</span> <span class="cm-operator">=</span> <span class="cm-atom">true</span>;
+          <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+        }
+      } <span class="cm-keyword">else</span> {
+        <span class="cm-variable-2">resolve</span>(<span class="cm-variable-2">x</span>)
+      }
+    }
+    
+    <span class="cm-keyword">class</span> <span class="cm-def">Promise</span> {
+      <span class="cm-property">constructor</span>(<span class="cm-def">excetor</span>) {
+        <span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">=</span> <span class="cm-string">'pedding'</span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">value</span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">reason</span>
+        <span class="cm-keyword">this</span>.<span class="cm-property">resolveEvents</span> <span class="cm-operator">=</span> []
+        <span class="cm-keyword">this</span>.<span class="cm-property">rejectEvents</span> <span class="cm-operator">=</span> []
+    
+        <span class="cm-keyword">let</span> <span class="cm-def">resolve</span> <span class="cm-operator">=</span> <span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> {
+          <span class="cm-keyword">if</span> (<span class="cm-variable-2">v</span> <span class="cm-keyword">instanceof</span> <span class="cm-variable">Promise</span>){
+            <span class="cm-keyword">return</span> <span class="cm-variable-2">v</span>.<span class="cm-property">then</span>(<span class="cm-variable-2">resolve</span>, <span class="cm-variable">reject</span>)
+          }
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">===</span> <span class="cm-string">'pedding'</span>) {
+            <span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">=</span> <span class="cm-string">'fulfilled'</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">value</span> <span class="cm-operator">=</span> <span class="cm-variable-2">v</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">resolveEvents</span>.<span class="cm-property">forEach</span>(<span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">v</span>())
+          }
+        }
+    
+        <span class="cm-keyword">let</span> <span class="cm-def">reject</span> <span class="cm-operator">=</span> <span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> {
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">===</span> <span class="cm-string">'pedding'</span>) {
+            <span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">=</span> <span class="cm-string">'rejected'</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">reason</span> <span class="cm-operator">=</span> <span class="cm-variable-2">v</span>
+            <span class="cm-keyword">this</span>.<span class="cm-property">rejectEvents</span>.<span class="cm-property">forEach</span>(<span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">v</span>())
+          }
+        }
+    
+        <span class="cm-keyword">try</span> {
+          <span class="cm-variable-2">excetor</span>(<span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+        } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+          <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+        }
+      }
+      <span class="cm-property">then</span>(<span class="cm-def">onFulfilled</span>, <span class="cm-def">onRejected</span>) {
+        <span class="cm-variable-2">onFulfilled</span> <span class="cm-operator">=</span> <span class="cm-keyword">typeof</span> <span class="cm-variable-2">onFulfilled</span> <span class="cm-operator">===</span> <span class="cm-string">'function'</span> <span class="cm-operator">?</span> <span class="cm-variable-2">onFulfilled</span> : <span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">v</span>
+        <span class="cm-variable-2">onRejected</span> <span class="cm-operator">=</span> <span class="cm-keyword">typeof</span> <span class="cm-variable-2">onRejected</span> <span class="cm-operator">===</span> <span class="cm-string">'function'</span> <span class="cm-operator">?</span> <span class="cm-variable-2">onRejected</span> : <span class="cm-def">v</span> <span class="cm-operator">=&gt;</span> { <span class="cm-keyword">throw</span> <span class="cm-variable-2">v</span> }
+    
+        <span class="cm-keyword">let</span> <span class="cm-def">p2</span>
+        <span class="cm-variable-2">p2</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+    
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">===</span> <span class="cm-string">'fulfilled'</span>) {
+            <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+              <span class="cm-keyword">try</span> {
+                <span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-variable-2">onFulfilled</span>(<span class="cm-keyword">this</span>.<span class="cm-property">value</span>)
+                <span class="cm-variable">resolvePromise</span>(<span class="cm-variable-2">p2</span>, <span class="cm-variable-2">x</span>, <span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+              } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+                <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+              }
+            }, <span class="cm-number">0</span>)
+          }
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">===</span> <span class="cm-string">'rejected'</span>) {
+            <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+              <span class="cm-keyword">try</span> {
+                <span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-variable-2">onRejected</span>(<span class="cm-keyword">this</span>.<span class="cm-property">reason</span>)
+                <span class="cm-variable">resolvePromise</span>(<span class="cm-variable-2">p2</span>, <span class="cm-variable-2">x</span>, <span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+              } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+                <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+              }
+            }, <span class="cm-number">0</span>)
+          }
+    
+          <span class="cm-keyword">if</span> (<span class="cm-keyword">this</span>.<span class="cm-property">status</span> <span class="cm-operator">===</span> <span class="cm-string">'pedding'</span>) {
+            <span class="cm-keyword">this</span>.<span class="cm-property">resolveEvents</span>.<span class="cm-property">push</span>(() <span class="cm-operator">=&gt;</span> {
+              <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+                <span class="cm-keyword">try</span> {
+                  <span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-variable-2">onFulfilled</span>(<span class="cm-keyword">this</span>.<span class="cm-property">value</span>)
+                  <span class="cm-variable">resolvePromise</span>(<span class="cm-variable-2">p2</span>, <span class="cm-variable-2">x</span>, <span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+                } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+                  <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+                }
+              }, <span class="cm-number">0</span>)
+            })
+            <span class="cm-keyword">this</span>.<span class="cm-property">rejectEvents</span>.<span class="cm-property">push</span>(() <span class="cm-operator">=&gt;</span> {
+              <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+                <span class="cm-keyword">try</span> {
+                  <span class="cm-keyword">let</span> <span class="cm-def">x</span> <span class="cm-operator">=</span> <span class="cm-variable-2">onRejected</span>(<span class="cm-keyword">this</span>.<span class="cm-property">reason</span>)
+                  <span class="cm-variable">resolvePromise</span>(<span class="cm-variable-2">p2</span>, <span class="cm-variable-2">x</span>, <span class="cm-variable-2">resolve</span>, <span class="cm-variable-2">reject</span>)
+                } <span class="cm-keyword">catch</span> (<span class="cm-def">error</span>) {
+                  <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">error</span>)
+                }
+              }, <span class="cm-number">0</span>)
+            })
+          }
+        })
+        <span class="cm-keyword">return</span> <span class="cm-variable-2">p2</span>
+      }
+    }
+    
+    <span class="cm-comment">// 测试代码，用 promises-aplus-tests 依赖测</span>
+    <span class="cm-variable">Promise</span>.<span class="cm-property">defer</span> <span class="cm-operator">=</span> <span class="cm-variable">Promise</span>.<span class="cm-property">deferred</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> () {
+      <span class="cm-keyword">let</span> <span class="cm-def">dfd</span> <span class="cm-operator">=</span> {}
+      <span class="cm-variable-2">dfd</span>.<span class="cm-property">promise</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable-2">dfd</span>.<span class="cm-property">resolve</span> <span class="cm-operator">=</span> <span class="cm-variable-2">resolve</span>;
+        <span class="cm-variable-2">dfd</span>.<span class="cm-property">reject</span> <span class="cm-operator">=</span> <span class="cm-variable-2">reject</span>;
+      })
+      <span class="cm-keyword">return</span> <span class="cm-variable-2">dfd</span>;
+    }
+    
+    <span class="cm-variable">module</span>.<span class="cm-property">exports</span> <span class="cm-operator">=</span> <span class="cm-variable">Promise</span>
+    </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="KDNrN"><a class="lake-anchor" href="#KDNrN"></a>优缺点</h2>
+            <ul data-lake-indent="1">
+              <li>优点：</li>
+            </ul>
+            <ul data-lake-indent="2">
+              <li>可以解决异步并发问题（Promise.all）</li>
+              <li>链式调用</li>
+            </ul>
+            <ul data-lake-indent="1">
+              <li>缺点：</li>
+            </ul>
+            <ul data-lake-indent="2">
+              <li>还是基于回调的</li>
+              <li>无法中止（一旦 new Promise 就会执行，类似于 fetch API）</li>
+            </ul>
+            <p><br></p>
+            <h2 id="1KTxz"><a class="lake-anchor" href="#1KTxz"></a>扩展</h2>
+            <p style="text-indent: 2em;"><br></p>
+            <h3 id="KJQla"><a class="lake-anchor" href="#KJQla"></a>catch</h3>
+            <p><br></p>
+            <p>特点：失败的回调</p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22class%20Promise%20%7B%5Cn%5Ctconstructor%20()%20%7B%5Cn%20%20%5Ct%2F%2F%20...%5Cn%20%20%7D%5Cn%20%20catch%20(fn)%20%7B%5Cn%20%20%5Ctreturn%20this.then(null%2C%20fn)%5Cn%20%20%7D%5Cn%7D%22%2C%22id%22%3A%22RJ1dO%22%7D"
+              id="RJ1dO">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">class</span> <span class="cm-def">Promise</span> {
+      <span class="cm-property">constructor</span> () {
+        <span class="cm-comment">// ...</span>
+      }
+      <span class="cm-property">catch</span> (<span class="cm-def">fn</span>) {
+        <span class="cm-keyword">return</span> <span class="cm-keyword">this</span>.<span class="cm-property">then</span>(<span class="cm-atom">null</span>, <span class="cm-variable-2">fn</span>)
+      }
+    }</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="Hfs94"><a class="lake-anchor" href="#Hfs94"></a>all</h3>
+            <p><br></p>
+            <p>特点：并发执行多个 Promise ，都执行完时，按顺序返回结果</p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22Promise.all%20%3D%20function(values)%7B%5Cn%20%20return%20new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%20let%20results%20%3D%20%5B%5D%3B%5Cn%20%20%20%20let%20i%20%3D%200%3B%5Cn%20%20%20%20let%20processData%20%3D%20(value%2Cindex)%3D%3E%7B%5Cn%20%20%20%20%20%20results%5Bindex%5D%20%3D%20value%3B%5Cn%20%20%20%20%20%20if(%2B%2Bi%20%3D%3D%3D%20values.length)%7B%5Cn%20%20%20%20%20%20%20%20resolve(results)%3B%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%20%20%20%20for(let%20i%20%3D%200%20%3B%20i%3C%20values.length%3Bi%2B%2B)%7B%5Cn%20%20%20%20%20%20let%20current%20%3D%20values%5Bi%5D%3B%5Cn%20%20%20%20%20%20if((typeof%20current%20%3D%3D%3D%20'object'%20%26%26%20%20current%20!%3D%3Dnull)%7C%7C%20typeof%20current%20%3D%3D%20'function')%7B%5Cn%20%20%20%20%20%20%20%20if(typeof%20current.then%20%3D%3D%20'function')%7B%5Cn%20%20%20%20%20%20%20%20%20%20current.then(y%3D%3E%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20processData(y%2Ci)%3B%5Cn%20%20%20%20%20%20%20%20%20%20%7D%2Creject)%5Cn%20%20%20%20%20%20%20%20%7Delse%7B%5Cn%20%20%20%20%20%20%20%20%20%20processData(current%2Ci)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%7Delse%7B%5Cn%20%20%20%20%20%20%20%20processData(current%2Ci)%3B%5Cn%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%20%20%7D)%3B%5Cn%7D%22%2C%22id%22%3A%22IwAh3%22%7D"
+              id="IwAh3">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-variable">Promise</span>.<span class="cm-property">all</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">values</span>){
+      <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>,<span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+        <span class="cm-keyword">let</span> <span class="cm-def">results</span> <span class="cm-operator">=</span> [];
+        <span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+        <span class="cm-keyword">let</span> <span class="cm-def">processData</span> <span class="cm-operator">=</span> (<span class="cm-def">value</span>,<span class="cm-def">index</span>)<span class="cm-operator">=&gt;</span>{
+          <span class="cm-variable-2">results</span>[<span class="cm-variable-2">index</span>] <span class="cm-operator">=</span> <span class="cm-variable-2">value</span>;
+          <span class="cm-keyword">if</span>(<span class="cm-operator">++</span><span class="cm-variable-2">i</span> <span class="cm-operator">===</span> <span class="cm-variable-2">values</span>.<span class="cm-property">length</span>){
+            <span class="cm-variable-2">resolve</span>(<span class="cm-variable-2">results</span>);
+          }
+        }
+        <span class="cm-keyword">for</span>(<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span> ; <span class="cm-variable-2">i</span><span class="cm-operator">&lt;</span> <span class="cm-variable-2">values</span>.<span class="cm-property">length</span>;<span class="cm-variable-2">i</span><span class="cm-operator">++</span>){
+          <span class="cm-keyword">let</span> <span class="cm-def">current</span> <span class="cm-operator">=</span> <span class="cm-variable-2">values</span>[<span class="cm-variable-2">i</span>];
+          <span class="cm-keyword">if</span>((<span class="cm-keyword">typeof</span> <span class="cm-variable-2">current</span> <span class="cm-operator">===</span> <span class="cm-string">'object'</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span>  <span class="cm-variable-2">current</span> <span class="cm-operator">!==</span><span class="cm-atom">null</span>)<span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-keyword">typeof</span> <span class="cm-variable-2">current</span> <span class="cm-operator">==</span> <span class="cm-string">'function'</span>){
+            <span class="cm-keyword">if</span>(<span class="cm-keyword">typeof</span> <span class="cm-variable-2">current</span>.<span class="cm-property">then</span> <span class="cm-operator">==</span> <span class="cm-string">'function'</span>){
+              <span class="cm-variable-2">current</span>.<span class="cm-property">then</span>(<span class="cm-def">y</span><span class="cm-operator">=&gt;</span>{
+                <span class="cm-variable-2">processData</span>(<span class="cm-variable-2">y</span>,<span class="cm-variable-2">i</span>);
+              },<span class="cm-variable-2">reject</span>)
+            }<span class="cm-keyword">else</span>{
+              <span class="cm-variable-2">processData</span>(<span class="cm-variable-2">current</span>,<span class="cm-variable-2">i</span>);
+            }
+          }<span class="cm-keyword">else</span>{
+            <span class="cm-variable-2">processData</span>(<span class="cm-variable-2">current</span>,<span class="cm-variable-2">i</span>);
+          }
+        }
+      });
+    }</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h4 id="7N9oD"><a class="lake-anchor" href="#7N9oD"></a><br></h4>
+            <h3 id="fVBbf"><a class="lake-anchor" href="#fVBbf"></a>race</h3>
+            <p><br></p>
+            <p>特点：哪个先执行完，就用哪个的结果</p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22Promise.race%20%3D%20function(values)%7B%5Cn%20%20return%20new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%20for(let%20i%20%3D%200%20%3B%20i%3C%20values.length%3Bi%2B%2B)%7B%5Cn%20%20%20%20%20%20let%20current%20%3D%20values%5Bi%5D%3B%20%5Cn%20%20%20%20%20%20if((typeof%20current%20%3D%3D%3D%20'object'%20%26%26%20%20current%20!%3D%3Dnull)%7C%7C%20typeof%20current%20%3D%3D%20'function')%7B%5Cn%20%20%20%20%20%20%20%20let%20then%20%3D%20current.then%3B%5Cn%20%20%20%20%20%20%20%20if(typeof%20then%20%3D%3D%20'function')%7B%5Cn%20%20%20%20%20%20%20%20%20%20then.call(current%2Cresolve%2Creject)%5Cn%20%20%20%20%20%20%20%20%7Delse%7B%5Cn%20%20%20%20%20%20%20%20%20resolve(current)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7Delse%7B%5Cn%20%20%20%20%20%20%20%20%20%20resolve(current)%3B%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5Cn%20%20%7D)%3B%5Cn%7D%22%2C%22id%22%3A%22IQ03n%22%7D"
+              id="IQ03n">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-variable">Promise</span>.<span class="cm-property">race</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">values</span>){
+      <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>,<span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+        <span class="cm-keyword">for</span>(<span class="cm-keyword">let</span> <span class="cm-def">i</span> <span class="cm-operator">=</span> <span class="cm-number">0</span> ; <span class="cm-variable-2">i</span><span class="cm-operator">&lt;</span> <span class="cm-variable-2">values</span>.<span class="cm-property">length</span>;<span class="cm-variable-2">i</span><span class="cm-operator">++</span>){
+          <span class="cm-keyword">let</span> <span class="cm-def">current</span> <span class="cm-operator">=</span> <span class="cm-variable-2">values</span>[<span class="cm-variable-2">i</span>]; 
+          <span class="cm-keyword">if</span>((<span class="cm-keyword">typeof</span> <span class="cm-variable-2">current</span> <span class="cm-operator">===</span> <span class="cm-string">'object'</span> <span class="cm-operator">&amp;</span><span class="cm-operator">&amp;</span>  <span class="cm-variable-2">current</span> <span class="cm-operator">!==</span><span class="cm-atom">null</span>)<span class="cm-operator">|</span><span class="cm-operator">|</span> <span class="cm-keyword">typeof</span> <span class="cm-variable-2">current</span> <span class="cm-operator">==</span> <span class="cm-string">'function'</span>){
+            <span class="cm-keyword">let</span> <span class="cm-def">then</span> <span class="cm-operator">=</span> <span class="cm-variable-2">current</span>.<span class="cm-property">then</span>;
+            <span class="cm-keyword">if</span>(<span class="cm-keyword">typeof</span> <span class="cm-variable-2">then</span> <span class="cm-operator">==</span> <span class="cm-string">'function'</span>){
+              <span class="cm-variable-2">then</span>.<span class="cm-property">call</span>(<span class="cm-variable-2">current</span>,<span class="cm-variable-2">resolve</span>,<span class="cm-variable-2">reject</span>)
+            }<span class="cm-keyword">else</span>{
+             <span class="cm-variable-2">resolve</span>(<span class="cm-variable-2">current</span>);
+            }
+            }<span class="cm-keyword">else</span>{
+              <span class="cm-variable-2">resolve</span>(<span class="cm-variable-2">current</span>);
+            }
+        }
+      });
+    }</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="Q0VcS"><a class="lake-anchor" href="#Q0VcS"></a>
+              <p>finally</p>
+              <p><br></p>
+            </h3>
+            <p>特点：</p>
+            <ul>
+              <li>无论是成功还是失败都会执行</li>
+              <li>在执行之前</li>
+            </ul>
+            <ul data-lake-indent="1">
+              <li>如果之前的状态是成功态，就把成功的值继续往下传递</li>
+              <li>如果之前的状态是失败态，就把错误的原因继续往下抛</li>
+            </ul>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22Promise.prototype.finally%20%3D%20function%20(callBack)%20%7B%5Cn%5Ctreturn%20this.then(val%20%3D%3E%20%7B%5Cn%20%20%5Ctreturn%20Promise.resolve(callBack()).then(()%20%3D%3E%20val)%5Cn%20%20%7D%2C%20err%20%3D%3E%20%7B%5Cn%20%20%5Ctreturn%20Promise.reject(callBack()).then(()%20%3D%3E%20%7Bthrow%20err%7D)%5Cn%20%20%7D)%5Cn%7D%22%2C%22id%22%3A%22gZgPZ%22%7D"
+              id="gZgPZ">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-variable">Promise</span>.<span class="cm-property">prototype</span>.<span class="cm-property">finally</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span> (<span class="cm-def">callBack</span>) {
+      <span class="cm-keyword">return</span> <span class="cm-keyword">this</span>.<span class="cm-property">then</span>(<span class="cm-def">val</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-keyword">return</span> <span class="cm-variable">Promise</span>.<span class="cm-property">resolve</span>(<span class="cm-variable-2">callBack</span>()).<span class="cm-property">then</span>(() <span class="cm-operator">=&gt;</span> <span class="cm-variable-2">val</span>)
+      }, <span class="cm-def">err</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-keyword">return</span> <span class="cm-variable">Promise</span>.<span class="cm-property">reject</span>(<span class="cm-variable-2">callBack</span>()).<span class="cm-property">then</span>(() <span class="cm-operator">=&gt;</span> {<span class="cm-keyword">throw</span> <span class="cm-variable-2">err</span>})
+      })
+    }</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h3 id="81tX1"><a class="lake-anchor" href="#81tX1"></a>模拟 node 中 utils.promisify 方法</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22const%20promisify%20%3D%20fn%20%3D%3E%20(...args)%3D%3E%7B%5Cn%20%20return%20new%20Promise((resolve%2C%20reject)%3D%3E%7B%5Cn%20%20%20%20fn(...args%2Cfunction(err)%7B%5Cn%20%20%20%20%20%20if(err)%20reject(err)%3B%5Cn%20%20%20%20%20%20resolve()%3B%5Cn%20%20%20%20%7D)%3B%5Cn%20%20%7D)%5Cn%7D%22%2C%22id%22%3A%22ktWbV%22%7D"
+              id="ktWbV">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">const</span> <span class="cm-def">promisify</span> <span class="cm-operator">=</span> <span class="cm-def">fn</span> <span class="cm-operator">=&gt;</span> (<span class="cm-meta">...</span><span class="cm-def">args</span>)<span class="cm-operator">=&gt;</span>{
+      <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+        <span class="cm-variable-2">fn</span>(<span class="cm-meta">...</span><span class="cm-variable-2">args</span>,<span class="cm-keyword">function</span>(<span class="cm-def">err</span>){
+          <span class="cm-keyword">if</span>(<span class="cm-variable-2">err</span>) <span class="cm-variable-2">reject</span>(<span class="cm-variable-2">err</span>);
+          <span class="cm-variable-2">resolve</span>();
+        });
+      })
+    }</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h3 id="oq1Ac"><a class="lake-anchor" href="#oq1Ac"></a>try</h3>
+            <p><br></p>
+            <p>特点：既能捕获同步、又能捕获异步</p>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22%5Cnfunction%20fn()%7B%5Cn%20%20%20%2F%2F%20%E5%8F%AF%E8%83%BD%E5%87%BD%E6%95%B0%E4%B8%AD%E6%8A%9B%E5%87%BA%E4%BA%86%20%E5%90%8C%E6%AD%A5%E9%94%99%E8%AF%AF%20%E8%A6%81%E9%80%9A%E8%BF%87try-catch%20%E6%8D%95%E8%8E%B7%E5%BC%82%E5%B8%B8%5Cn%20%20%20throw%20new%20Error('err')%3B%5Cn%20%20%20%2F%2F%20%20%20%20return%20new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%2F%2F%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%2F%2F%20%20%20%20%20%20%20%20%20reject('xxx')%3B%5Cn%20%20%20%2F%2F%20%20%20%20%20%20%20%20%7D%2C%203000)%3B%5Cn%20%20%20%2F%2F%20%20%20%20%7D)%5Cn%7D%5Cn%5CnPromise.try%20%3D%20function(callback)%7B%5Cn%20%20%20return%20new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%20%20%20%2F%2F%20Promise.resolve%20%E5%8F%AA%E8%83%BD%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA%E6%88%90%E5%8A%9F%E7%9A%84promise%5Cn%20%20%20%20%20%20return%20Promise.resolve(callback()).then(resolve%2Creject)%5Cn%20%20%20%7D)%5Cn%7D%5Cn%5CnPromise.try(fn).catch(err%3D%3E%7B%5Cn%20%20%20console.log('err%3A'%2Berr)%3B%5Cn%7D)%3B%22%2C%22id%22%3A%22SIbUD%22%7D"
+              id="SIbUD">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default">
+    <span class="cm-keyword">function</span> <span class="cm-def">fn</span>(){
+       <span class="cm-comment">// 可能函数中抛出了 同步错误 要通过try-catch 捕获异常</span>
+       <span class="cm-keyword">throw</span> <span class="cm-keyword">new</span> <span class="cm-variable">Error</span>(<span class="cm-string">'err'</span>);
+       <span class="cm-comment">//    return new Promise((resolve,reject)=&gt;{</span>
+       <span class="cm-comment">//        setTimeout(() =&gt; {</span>
+       <span class="cm-comment">//         reject('xxx');</span>
+       <span class="cm-comment">//        }, 3000);</span>
+       <span class="cm-comment">//    })</span>
+    }
+    
+    <span class="cm-variable">Promise</span>.<span class="cm-property">try</span> <span class="cm-operator">=</span> <span class="cm-keyword">function</span>(<span class="cm-def">callback</span>){
+       <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>,<span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+          <span class="cm-comment">// Promise.resolve 只能返回一个成功的promise</span>
+          <span class="cm-keyword">return</span> <span class="cm-variable">Promise</span>.<span class="cm-property">resolve</span>(<span class="cm-variable-2">callback</span>()).<span class="cm-property">then</span>(<span class="cm-variable-2">resolve</span>,<span class="cm-variable-2">reject</span>)
+       })
+    }
+    
+    <span class="cm-variable">Promise</span>.<span class="cm-property">try</span>(<span class="cm-variable">fn</span>).<span class="cm-property">catch</span>(<span class="cm-def">err</span><span class="cm-operator">=&gt;</span>{
+       <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'err:'</span><span class="cm-operator">+</span><span class="cm-variable-2">err</span>);
+    });</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h3 id="scDme"><a class="lake-anchor" href="#scDme"></a><span>如何中断</span>链式调用</h3>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22let%20p%20%3D%20new%20Promise((resolve%2C%20reject)%20%3D%3E%20%7B%5Cn%5Ctresolve()%5Cn%7D)%5Cn%5Cnlet%20p1%20%3D%20p.then(()%20%3D%3E%20%7B%5Cn%5Ctconsole.log('ok')%5Cn%20%20return%20new%20Promise(()%20%3D%3E%20%7B%7D)%5Cn%7D).then(()%20%3D%3E%20%7B%5Cn%5Ctconsole.log(1)%5Cn%7D)%22%2C%22id%22%3A%22Zs8YU%22%7D"
+              id="Zs8YU">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>, <span class="cm-def">reject</span>) <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable-2">resolve</span>()
+    })
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">p1</span> <span class="cm-operator">=</span> <span class="cm-variable">p</span>.<span class="cm-property">then</span>(() <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-string">'ok'</span>)
+      <span class="cm-keyword">return</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>(() <span class="cm-operator">=&gt;</span> {})
+    }).<span class="cm-property">then</span>(() <span class="cm-operator">=&gt;</span> {
+      <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-number">1</span>)
+    })</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <h3 id="IjvvN"><a class="lake-anchor" href="#IjvvN"></a>如何放弃某个 Promise 的执行结果</h3>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>Promise.race 的一个应用场景</p>
+            </blockquote>
+            <p><br></p>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20wrap(p1)%7B%5Cn%20%20%20%20let%20fail%20%3D%20null%3B%5Cn%20%20%20%20let%20p2%20%3D%20new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%20%20%20%20%20fail%20%3D%20reject%3B%20%2F%2F%20%E5%85%88%E5%B0%86p2%E5%A4%B1%E8%B4%A5%E7%9A%84%E6%96%B9%E6%B3%95%E6%9A%B4%E9%9C%B2%E5%87%BA%E6%9D%A5%20%5Cn%20%20%20%20%7D)%3B%5Cn%5Cn%20%20%20%20let%20p%20%3D%20Promise.race(%5Bp2%2Cp1%5D)%3B%20%2F%2F%20race%E6%96%B9%E6%B3%95%E8%BF%94%E5%9B%9E%E7%9A%84%E4%B9%9F%E6%98%AF%E4%B8%80%E4%B8%AApromise%5Cn%20%20%20%20p.abort%20%3D%20fail%3B%5Cn%20%20%20%20return%20p%5Cn%7D%5Cn%5Cnlet%20p%20%3D%20wrap(new%20Promise((resolve%2Creject)%3D%3E%7B%5Cn%20%20%20%20setTimeout(()%20%3D%3E%20%7B%5Cn%20%20%20%20%20%20%20%20resolve('ok')%3B%5Cn%20%20%20%20%7D%2C%203000)%3B%5Cn%7D))%5Cn%5Cnp.abort('error')%3B%20%2F%2F%20%E6%94%BE%E5%BC%83%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C%5Cn%5Cnp.then(data%20%3D%3E%20%7B%5Cn%20%20%20%20console.log(data)%3B%5Cn%7D).catch(err%20%3D%3E%20%7B%5Cn%20%20%20%20console.log(err)%3B%5Cn%7D)%3B%22%2C%22id%22%3A%22nXlhz%22%7D"
+              id="nXlhz">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">wrap</span>(<span class="cm-def">p1</span>){
+        <span class="cm-keyword">let</span> <span class="cm-def">fail</span> <span class="cm-operator">=</span> <span class="cm-atom">null</span>;
+        <span class="cm-keyword">let</span> <span class="cm-def">p2</span> <span class="cm-operator">=</span> <span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>,<span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+            <span class="cm-variable-2">fail</span> <span class="cm-operator">=</span> <span class="cm-variable-2">reject</span>; <span class="cm-comment">// 先将p2失败的方法暴露出来 </span>
+        });
+    
+        <span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-variable">Promise</span>.<span class="cm-property">race</span>([<span class="cm-variable-2">p2</span>,<span class="cm-variable-2">p1</span>]); <span class="cm-comment">// race方法返回的也是一个promise</span>
+        <span class="cm-variable-2">p</span>.<span class="cm-property">abort</span> <span class="cm-operator">=</span> <span class="cm-variable-2">fail</span>;
+        <span class="cm-keyword">return</span> <span class="cm-variable-2">p</span>
+    }
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">p</span> <span class="cm-operator">=</span> <span class="cm-variable">wrap</span>(<span class="cm-keyword">new</span> <span class="cm-variable">Promise</span>((<span class="cm-def">resolve</span>,<span class="cm-def">reject</span>)<span class="cm-operator">=&gt;</span>{
+        <span class="cm-variable">setTimeout</span>(() <span class="cm-operator">=&gt;</span> {
+            <span class="cm-variable-2">resolve</span>(<span class="cm-string">'ok'</span>);
+        }, <span class="cm-number">3000</span>);
+    }))
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">abort</span>(<span class="cm-string">'error'</span>); <span class="cm-comment">// 放弃执行结果</span>
+    
+    <span class="cm-variable">p</span>.<span class="cm-property">then</span>(<span class="cm-def">data</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">data</span>);
+    }).<span class="cm-property">catch</span>(<span class="cm-def">err</span> <span class="cm-operator">=&gt;</span> {
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable-2">err</span>);
+    });</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <p><br></p>
+            <p><br></p>
+            <h1 id="GQtyA"><a class="lake-anchor" href="#GQtyA"></a>generator&nbsp;与&nbsp;终极异步解决方案</h1>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>类数组：有&nbsp;<span style="color: #008000;">Symbol.iterator&nbsp;的数据（可以被迭代）</span></p>
+            </blockquote>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="Po7mw"><a class="lake-anchor" href="#Po7mw"></a>认识generator</h2>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20*%20read()%7B%5Cn%20%20%20yield%201%3B%5Cn%20%20%20yield%202%3B%5Cn%20%20%20yield%203%3B%5Cn%20%20%20return%20100%5Cn%7D%5Cn%5Cn%2F*%5Cn%20%20%20generator%20%E8%BF%94%E5%9B%9E%E7%9A%84%E6%98%AF%E7%94%9F%E6%88%90%E5%99%A8%20%E7%94%9F%E6%88%90%E5%99%A8%E6%9C%89%E4%B8%80%E4%B8%AAnext%E6%96%B9%E6%B3%95%EF%BC%8C%E8%B0%83%E7%94%A8%E8%BF%99%E4%B8%AA%E6%96%B9%E6%B3%95%20%E4%BC%9A%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%5Cn%20%20%20%E5%AF%B9%E8%B1%A1done%3A%E6%98%AF%E5%90%A6%E8%BF%AD%E4%BB%A3%E5%AE%8C%E6%88%90%20value%20%E4%BA%A7%E5%87%BA%E7%9A%84%E7%BB%93%E6%9E%9C%5Cn*%2F%5Cn%5Cnlet%20it%20%3D%20read()%3B%5Cnconsole.log(it.next())%3B%5Cnconsole.log(it.next())%3B%5Cnconsole.log(it.next())%3B%5Cnconsole.log(it.next())%3B%22%2C%22id%22%3A%22dCVeE%22%7D"
+              id="dCVeE">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre
+                          class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-keyword">*</span> <span class="cm-def">read</span>(){
+       <span class="cm-keyword">yield</span> <span class="cm-number">1</span>;
+       <span class="cm-keyword">yield</span> <span class="cm-number">2</span>;
+       <span class="cm-keyword">yield</span> <span class="cm-number">3</span>;
+       <span class="cm-keyword">return</span> <span class="cm-number">100</span>
+    }
+    
+    <span class="cm-comment">/*</span>
+    <span class="cm-comment">   generator 返回的是生成器 生成器有一个next方法，调用这个方法 会返回一个对象</span>
+    <span class="cm-comment">   对象done:是否迭代完成 value 产出的结果</span>
+    <span class="cm-comment">*/</span>
+    
+    <span class="cm-keyword">let</span> <span class="cm-def">it</span> <span class="cm-operator">=</span> <span class="cm-variable">read</span>();
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">it</span>.<span class="cm-property">next</span>());
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">it</span>.<span class="cm-property">next</span>());
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">it</span>.<span class="cm-property">next</span>());
+    <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">it</span>.<span class="cm-property">next</span>());</pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <blockquote style="padding-left: 1em;">
+              <p>第一次调用<code>next</code>传参没有任何意义，从第二次<span
+                  style="background-color: rgba(0, 0, 0, 0.06);">next</span>开始，参数才会<span>每次</span>被接收<code>yield</code>接收
+              </p>
+            </blockquote>
+            <p><br></p>
+            <p><br></p>
+            <h2 id="B8FUs"><a class="lake-anchor" href="#B8FUs"></a>返回一个可迭代的数据</h2>
+            <div data-card-type="block" data-lake-card="codeblock" contenteditable="false"
+              data-card-value="data:%7B%22mode%22%3A%22javascript%22%2C%22code%22%3A%22function%20arg()%7B%20%2F%2F%20Symbol.iterator%E5%8F%AF%E4%BB%A5%E8%A2%AB%E8%BF%AD%E4%BB%A3%E7%9A%84%E6%96%B9%E6%B3%95%20%5Cn%20%20%20%20let%20arr%20%3D%20%5B...%7B0%3A1%2C1%3A2%2C2%3A3%2C3%3A4%2Clength%3A4%2C%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5Cn%20%20%20%20%20%20%20%20%2F%2F%20%E6%96%B9%E6%A1%88%E4%B8%80%20%20%20%20%20%20%20%20%20%20%20%5Cn%20%20%20%20%20%20%20%20%5BSymbol.iterator%5D%3Afunction%20*%20()%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20let%20index%20%3D%200%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20while(index%20!%3D%20this.length)%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20yield%20this%5Bindex%2B%2B%5D%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%5Cn%20%20%20%20%20%20%20%20%2F%2F%20%E6%96%B9%E6%A1%88%E4%BA%8C%5Cn%20%20%20%20%20%20%20%20%5BSymbol.iterator%5D%3Afunction()%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20let%20index%20%3D%200%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20return%20%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20next%3A()%3D%3E%7B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%20%7Bdone%3Athis.length%20%3D%3D%20index%2Cvalue%3Athis%5Bindex%2B%2B%5D%7D%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%20%20%20%20%7D%5Cn%20%20%20%20%7D%5D%5Cn%20%20%20%20console.log(arr)%3B%5Cn%7D%5Cn%5Cnarg(1%2C2%2C3)%20%2F%2F%20%5B1%2C%202%2C%203%5D%22%2C%22id%22%3A%22MrTv4%22%7D"
+              id="MrTv4">
+              <div data-card-element="body">
+                <div data-card-element="center">
+                  <div class="lake-codeblock lake-codeblock-javascript">
+
+                    <div class="lake-codeblock-content">
+                      <div class="CodeMirror">
+                        <pre
+                          class="cm-s-default"><span class="cm-keyword">function</span> <span class="cm-def">arg</span>(){ <span class="cm-comment">// Symbol.iterator可以被迭代的方法 </span>
+        <span class="cm-keyword">let</span> <span class="cm-def">arr</span> <span class="cm-operator">=</span> [<span class="cm-meta">...</span>{<span class="cm-number cm-property">0</span>:<span class="cm-number">1</span>,<span class="cm-number cm-property">1</span>:<span class="cm-number">2</span>,<span class="cm-number cm-property">2</span>:<span class="cm-number">3</span>,<span class="cm-number cm-property">3</span>:<span class="cm-number">4</span>,<span class="cm-property">length</span>:<span class="cm-number">4</span>,
+                    
+            <span class="cm-comment">// 方案一           </span>
+            [<span class="cm-variable">Symbol</span>.<span class="cm-property">iterator</span>]:<span class="cm-keyword">function</span> <span class="cm-keyword">*</span> (){
+                <span class="cm-keyword">let</span> <span class="cm-def">index</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+                <span class="cm-keyword">while</span>(<span class="cm-variable-2">index</span> <span class="cm-operator">!=</span> <span class="cm-keyword">this</span>.<span class="cm-property">length</span>){
+                    <span class="cm-keyword">yield</span> <span class="cm-keyword">this</span>[<span class="cm-variable-2">index</span><span class="cm-operator">++</span>];
+                }
+            }
+            
+            <span class="cm-comment">// 方案二</span>
+            [<span class="cm-variable">Symbol</span>.<span class="cm-property">iterator</span>]:<span class="cm-keyword">function</span>(){
+                <span class="cm-keyword">let</span> <span class="cm-variable">index</span> <span class="cm-operator">=</span> <span class="cm-number">0</span>;
+                <span class="cm-keyword">return</span> {
+                    <span class="cm-variable">next</span>:()<span class="cm-operator">=&gt;</span>{
+                        <span class="cm-keyword">return</span> {<span class="cm-property">done</span>:<span class="cm-keyword">this</span>.<span class="cm-property">length</span> <span class="cm-operator">==</span> <span class="cm-variable">index</span>,<span class="cm-property">value</span>:<span class="cm-keyword">this</span>[<span class="cm-variable">index</span><span class="cm-operator">++</span>]}
+                    }
+                }
+            }
+        }]
+        <span class="cm-variable">console</span>.<span class="cm-property">log</span>(<span class="cm-variable">arr</span>);
+    }
+    
+    <span class="cm-variable">arg</span>(<span class="cm-number">1</span>,<span class="cm-number">2</span>,<span class="cm-number">3</span>) <span class="cm-comment">// [1, 2, 3]</span></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p><br></p>
+            <h2 id="FTTFg"><a class="lake-anchor" href="#FTTFg"></a>终极方案</h2>
+            <p>async + await&nbsp;</p>
+          </div>
+        </div>
+      </div>
+      <div class="reward___3M6_P" style="user-select: none;">
+        <div class="lark-like lark-like-vertical">
+          <p class="lark-like-doc-tip"><span>若有收获，就赏束稻谷吧</span></p>
+          <div class="lark-like-btn-wrap">
+            <div class="lark-like-btn lark-like-btn-inanimate"><span class="lark-like-icon"></span><span
+                class="lark-like-circle"></span><span class="lark-like-sparks"><span
+                  class="lark-like-spark lark-like-spark-1"></span><span
+                  class="lark-like-spark lark-like-spark-2"></span><span
+                  class="lark-like-spark lark-like-spark-3"></span><span
+                  class="lark-like-spark lark-like-spark-4"></span><span
+                  class="lark-like-spark lark-like-spark-5"></span><span
+                  class="lark-like-spark lark-like-spark-6"></span><span
+                  class="lark-like-spark lark-like-spark-7"></span></span></div>
+          </div><span class="lark-like-count"><span>0</span> 颗稻谷</span>
+        </div>
+      </div>
+    </article>
+    <div class="meta___ZMU93">
+      <div style="user-select: none;">
+        <div class="wrapper___2k3mA">
+          <div class="meta-left">
+            <div class="meta-item"><span class="author larkicon larkicon-user"></span><span
+                class="doc-contributors"><span><a href="/leechar">LeeChar</a></span></span></div>
+            <div class="meta-item"><span><span class="larkicon larkicon-clock"></span><span
+                  class="item-text"><span>08-29 22:15</span></span></span></div>
+            <div class="meta-item"><span><span class="larkicon larkicon-read"></span><span
+                  class="item-text">0</span></span></div>
+            <div class="meta-item"><span><span class="larkicon larkicon-comments"></span><span
+                  class="item-text">0</span></span></div>
+          </div>
+          <div class="meta-right"></div>
+        </div>
+      </div>
+    </div>
+    <div style="user-select: none;">
+      <div class="wrapper___8HhiZ">
+        <div class="prev___2peF9"></div>
+        <div class="next___W6ZdR"><a href="/leechar/nw8kqm/oliil9" class="pager___2Ys93">
+            <div class="label___2_MgD"><span>下一篇</span><i aria-label="图标: right"
+                class="anticon anticon-right labelIcon___2oR-8"><svg viewBox="64 64 896 896" focusable="false" class=""
+                  data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z">
+                  </path>
+                </svg></i></div>
+            <h6 class="title___3X_vo">变量声明的特性、Set与Map(WeakMap)、数据劫持</h6>
+          </a></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./dist/bundle.js"></script>
+  <script>
+    catalogueForHtml()
+  </script>
+</body>
+
+</html>
