@@ -6,10 +6,16 @@ module.exports = env => {
 
   const base = {
     mode: env,
-    entry: resolve('./index.js'),
+    entry: resolve('./src/index.js'),
     output: {
       path: resolve('./dist'),
-      filename: 'bundle.[hash:6].js'
+      filename: 'bundle.js'
+    },
+    module: {
+      rules: [{
+        test: /\.js$/,
+        use: 'babel-loader'
+      }]
     },
     plugins: [
       new CleanWebpackPlugin()
