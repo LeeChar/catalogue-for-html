@@ -4,10 +4,12 @@ const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = env => {
+  const isDev = env === 'development';
 
   const base = {
     mode: env,
     entry: resolve('index.js'),
+    devtool: isDev ? 'cheap-module-eval-source-map' : false,
     output: {
       path: resolve('./dist'),
       filename: 'bundle.js'
@@ -31,6 +33,7 @@ module.exports = env => {
       new CleanWebpackPlugin(),
       new webpack.LoaderOptionsPlugin({
         options: {
+          noParse: /jquery/,
           eslint: {
             configFile: resolve('.eslintrc.json'),
             failOnWarning: true,
